@@ -1,9 +1,28 @@
 
 # 轻悦时光
-一款多平台可用的阅读软件，通过 webview 来运行书源以达到多平台兼容的效果。qq交流群：519620220
+一款多平台可用的阅读软件，通过 webview 来运行书源以达到多平台兼容的效果。
+
+# 交流群
+qq交流群：519620220
+
+# 正文文本说明
+正文文本不支持除了img 以外的标签, 图片可以使用img标签例如 \<img src="****">    
+img 标签里的src 支持header 如果需要修改header可以这么设置,http://127.0.0.1,{"headers":{"a":"b"}} ,当然这种写法不仅仅支持这也支持封面
+
+# 正文图片解析说明
+和文字同行的图片会默认识别为段评，小图显示，其他图片会正常显示。   
+例如
+````
+轻悦时光是最好用的阅读器<img src="a" />,支持多平台<img src="b" />。\r\n <img src="c" />
+````
+上面ab 两个图片会以段评显示，c正常显示。    
+如果想点击支持js请这么写： \<img src='b,{"js":"要运行的js"}'/> 请注意像这种用了双引号的 外面必须用单引号。
 
 # 通用 js
 通用 js 的函数分前台 webview 可用和源可用，源可用的话只能在书源代码中使用，前台 webview 可用那表示能在登录或者你启动的前台 webview 中使用, 未单独说明的是两种情况下都能用
+
+
+
 
 ````
 <script>
@@ -241,6 +260,26 @@
         return  "";
       }
     }
+    
+    //utf8 字符串转base64
+     async base64encode(str) {
+      try {
+        return await window.flutter_inappwebview.callHandler('base64encode',str);
+      } catch (error) {
+        return  "";
+      }
+    }
+    
+    //base64 转utf8字符串
+    async base64decode(str) {
+      try {
+        return await window.flutter_inappwebview.callHandler('base64decode',str);
+      } catch (error) {
+        return  "";
+      }
+    }
+    
+    
 
   }
 
@@ -359,6 +398,15 @@
     async set(url,value) {
       try {
         return await window.flutter_inappwebview.callHandler('cookie.set',url,value);
+      } catch (error) {
+        return  null;
+      }
+    }
+    
+    //设置单独一个cookie
+    async setCookie(url,key,value) {
+      try {
+        return await window.flutter_inappwebview.callHandler('cookie.setcookie',url,key,value);
       } catch (error) {
         return  null;
       }
