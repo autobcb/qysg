@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>宝华书院</title>
+</head>
+<body>
+
+</body>
+<script src="https://vc.jd.com/web/js/jquery-3.1.1.min.js"></script>
+<!--如果要引入外部 js 必须在书源代码的上面-->
+<script>
+  var isCookieJar=true;// 不需要CookieJar请修改此处
+  class FlutterJSBridge {
+    constructor() {
+      this.init(); //前台webview 里必须删除这行
+    }
+
+    init() {
+      if (window.flutter_inappwebview) {
+        this.isReady = true;
+        this.CookieJar();
+      } else {
+        window.addEventListener('flutterInAppWebViewPlatformReady', () => {
+          this.isReady = true;
+          console.log('JSBridge初始化完成');
+          this.CookieJar();
+        });
+      }
+    }
+
+    //通知原生页面初始化完成，仅在书源和tts生效，webview请勿使用，只有通知加载成功后才允许运行，否则会一直等待加载成功
+    async CookieJar() {
+      try {
+        await window.flutter_inappwebview.callHandler('CookieJar', isCookieJar);
+      } catch (error) {
+        console.error('汇报完成准备失败:', error);
+      }
+    }
+
+    //获取应用编译版本
+    async getbuildNumber() {
+      try {
+        return await window.flutter_inappwebview.callHandler('buildNumber');
+      } catch (error) {
+        return  0;
+      }
+    }
+
+    //获取应用版本
+    async getversion() {
+      try {
+        return await window.flutter_inappwebview.callHandler('version');
+      } catch (error) {
+        return  "0.0.0";
+      }
+    }
+
+    //获取设备唯一id
+    async getDeviceid() {
+      try {
+        return await window.flutter_inappwebview.callHandler('id');
+      } catch (error) {
+        return  "";
+      }
+    }
+
+    //获取设备平台 此处返回 windows、macos、ios、ohos、android
+    async getDevice() {
+      try {
+        return await window.flutter_inappwebview.callHandler('device');
+      } catch (error) {
+        return  "";
+      }
+    }
+
+    //输出日志,前台webview请勿使用
+    //str 为 String
+    async log(str) {
+      try {
+        return await window.flutter_inappwebview.callHandler('log',str);
+      } catch (error) {
+        return  false;
+      }
+    }
+
+    //书源调试时可输出 html 代码到前台
+    //type 0 搜索源码 ， 1详情源码 ，2目录源码 ，3正文源码
+    //str 为 String
+    //type 为int
+    async text(type,str) {
+      try {
+        return await window.flutter_inappwebview.callHandler('text',type,str);
+      } catch (error) {
+        return  false;
+      }
+    }
+
+    //toast弹窗
+    //str 为 String
+    async showToast(str) {
+      try {
+        return await window.flutter_inappwebview.callHandler('showToast',str);
+      } catch (error) {
+        return  false;
+      }
+    }
+
+    //获取默认ua
+    async getWebViewUA() {
+      try {
+        return await window.flutter_inappwebview.callHandler('getWebViewUA');
+      } catch (error) {
+        return  "";
+      }
+    }
+
+    //通过url打开外部应用
+    //url 为 String
+    async openurl(url) {
+      try {
+        return await window.flutter_inappwebview.callHandler('openurl',url,"");
+      } catch (error) {
+        return  false;
+      }
+    }
+
+    //通过url打开外部应用并附带mimeType
+    //url 为 String
+    //mimeType 为 String
+    async openurlwithMimeType(url,mimeType) {
+      try {
+        return await window.flutter_inappwebview.callHandler('openurl',url,mimeType);
+      } catch (error) {
+        return  false;
+      }
+    }
+
+    /**
+     * 使用webView访问网络
+     * @param html 直接用webView载入的html, 如果html为空直接访问url
+     * @param url html内如果有相对路径的资源不传入url访问不了
+     * @param js 用来取返回值的js语句, 没有就返回整个源代码
+     * @param body 当参数不为空的时候，会以post请求，此时请务必在 header 中带上content-type
+     * @param header 请求的header头，此参数必须是json字符串
+     * @return 返回js获取的内容
+     */
+    async webview(url,js,html,body,header) {
+      try {
+        return await window.flutter_inappwebview.callHandler('webview',url,js,html,body,header,"","");
+      } catch (error) {
+        return  "";
+      }
+    }
+
+    /**
+     * overrideUrlRegex 为正则表达式
+     * 使用方法和上面的一样
+     * 但返回的内容为正则到的内容，如果无法正则到则返回 js 获取的内容，如果 js 为空则返回页面 html
+     */
+    async webViewGetOverrideUrl(url,js,html,body,header,overrideUrlRegex) {
+      try {
+        return await window.flutter_inappwebview.callHandler('webview',url,js,html,body,header,overrideUrlRegex,"");
+      } catch (error) {
+        return  "";
+      }
+    }
+
+    /**
+     * 使用webView获取资源url
+     * urlregex 为正则表达式
+     * 使用方法和上面的一样
+     * 但返回的内容为正则到的内容，如果无法正则到则返回 js 获取的内容，如果 js 为空则返回页面 html
+     */
+    async webViewGetSource(url,js,html,body,header,urlregex) {
+      try {
+        return await window.flutter_inappwebview.callHandler('webview',url,js,html,body,header,"",urlregex);
+      } catch (error) {
+        return  "";
+      }
+    }
+
+
+    /**
+     * 启动前台 webview 访问链接并获取结束时的 html，可用于手工过盾
+     * @param url 网址
+     * @param title 标题
+     * @param header 请求的header头，此参数必须是json字符串
+     * @return 返回网页的内容
+     */
+    async startBrowser(url,title,header) {
+      try {
+        return await window.flutter_inappwebview.callHandler('startBrowser',url,title,header);
+      } catch (error) {
+        return  "";
+      }
+    }
+
+    //专门为段评设置的半屏显示，不返回任何东西
+    async startBrowserDp(url,title) {
+      try {
+        return await window.flutter_inappwebview.callHandler('startBrowserDp',url,title);
+      } catch (error) {
+        return  "";
+      }
+    }
+
+    //仅前台webview可以使用，返回按钮，返回上一个页面
+    async back() {
+      try {
+        return await window.flutter_inappwebview.callHandler('back');
+      } catch (error) {
+        return  false;
+      }
+    }
+
+    //将 utf8字符串转到 gbk 并 url 编码
+    async utf8ToGbkUrlEncoded(str) {
+      try {
+        return await window.flutter_inappwebview.callHandler('utf8ToGbkUrlEncoded',str);
+      } catch (error) {
+        return  "";
+      }
+    }
+
+    /*
+    * @param str为图片链接
+    * @param header 请求的header头，此参数必须是json字符串
+    * 此函数是让用户输入图片中的验证码，当链接为空则直接让用户输入验证码
+    */
+    async getVerificationCode(str,header) {
+      try {
+        return await window.flutter_inappwebview.callHandler('getVerificationCode',str,header);
+      } catch (error) {
+        return  "";
+      }
+    }
+
+    //提交内容书本信息 json 后的字符串
+    async addbook(book) {
+      try {
+        return await window.flutter_inappwebview.callHandler('addbook',book);
+      } catch (error) {
+        return  "";
+      }
+    }
+
+  }
+
+  //webview请勿使用
+  //以下提交的url，headers,body 都必须为字符串,headers必须为json字符串
+  //当followRedirects 为 false 时不处理重定向，当为 true 时会自动处理重定向 ，如不明白用途直接用 true 最佳
+  // 以下所有参数除当followRedirects外均为 String
+  class Http {
+    constructor() {}
+
+    /*
+     * 通用返回字段
+     * method post get 或者 head
+     * body 请求返回后的字节的 base64
+     * headers  map<String,List<String>> 可通过headers[""]来或者
+     * statusCode 状态码
+     * statusMessage
+     * data 返回后的字节 格式化后的内容
+     */
+    async Get(url,headers,followRedirects) {
+      try {
+        return await window.flutter_inappwebview.callHandler('http',"get",url,"",JSON.stringify(headers),followRedirects,"");
+      } catch (error) {
+        return  null;
+      }
+    }
+
+    async Head(url,headers,followRedirects) {
+      try {
+        return await window.flutter_inappwebview.callHandler('http',"head",url,"",JSON.stringify(headers),followRedirects,"");
+      } catch (error) {
+        return  null;
+      }
+    }
+
+
+    async Post(url,headers,body,contenttype,followRedirects) {
+      try {
+        return await window.flutter_inappwebview.callHandler('http',"post",url,body,JSON.stringify(headers),followRedirects,contenttype);
+      } catch (error) {
+        return  null;
+      }
+    }
+  }
+
+  class Cache {
+    constructor() {}
+    async get(key) {
+      try {
+        return await window.flutter_inappwebview.callHandler('cache.get',key);
+      } catch (error) {
+        return  null;
+      }
+    }
+
+    async set(key,value) {
+      try {
+        return await window.flutter_inappwebview.callHandler('cache.set',key,value);
+      } catch (error) {
+        return  null;
+      }
+    }
+
+    async remove(key) {
+      try {
+        return await window.flutter_inappwebview.callHandler('cache.remove',key);
+      } catch (error) {
+        return  null;
+      }
+    }
+
+    //如果登录为弹窗格式的，里面输入框输入的内容可以通过这个函数获取，默认返回的json格式或者为空，需要自行转换
+    async getLoginInfo(){
+      return await  this.get("LoginInfo")
+    }
+
+    //将修改后的弹窗输入内容报错 ，必须 JSON.stringify，不然会出错
+    async putLoginInfo(info){
+      return await  this.set("LoginInfo",info)
+    }
+
+    //获取书本变量
+    async getbookVariable(bookurl){
+      return await  this.get(bookurl)
+    }
+
+    //写入书本变量
+    async setbookVariable(bookurl,value){
+      return await  this.set(bookurl,value)
+    }
+  }
+
+  class Cookie {
+    constructor() {}
+
+    //通过url获取当前url的所有cookie
+    async get(url) {
+      try {
+        return await window.flutter_inappwebview.callHandler('cookie.get',url);
+      } catch (error) {
+        return  null;
+      }
+    }
+
+    //通过url删除当前url的所有cookie
+    async remove(url) {
+      try {
+        return await window.flutter_inappwebview.callHandler('cookie.remove',url);
+      } catch (error) {
+        return  null;
+      }
+    }
+
+
+    //通过url保存当前url的所有cookie
+    async set(url,value) {
+      try {
+        return await window.flutter_inappwebview.callHandler('cookie.set',url,value);
+      } catch (error) {
+        return  null;
+      }
+    }
+
+    //通过 url 获取单个 cookie 的值
+    async getCookie(url,value) {
+      try {
+        return await window.flutter_inappwebview.callHandler('cookie.getCookie',url,value);
+      } catch (error) {
+        return  null;
+      }
+    }
+  }
+
+  //安全的创建一个 div 解析 html
+  function parseHTMLSafely(htmlStr) {
+    try {
+      // 在函数作用域内创建独立的临时容器
+      // 每个调用创建新的jQuery对象，互不影响
+      var tempDiv = document.createElement('div');
+      tempDiv.innerHTML = htmlStr;
+      return $(tempDiv);
+    } catch (e) {
+      flutterBridge.log("HTML解析错误:"+e.message);
+      return $('<div>');
+    }
+  }
+
+  //parseHTMLSafely 创建的用完后必须删除
+  function removeHTMLSafely(tempContainer) {
+    try {
+      tempContainer.innerHTML = '';
+      if (tempContainer.parentNode) {
+        tempContainer.parentNode.removeChild(tempContainer);
+      }
+    } catch (e) {
+      flutterBridge.log("HTML移除失败:"+e.message);
+    }
+  }
+
+  //移除 css js，创建parseHTMLSafely前如果用不上 cssjs 建议移除
+  function removeHTMLTags(htmlString) {
+    // 移除script标签
+    let result = htmlString.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+    // 移除style标签
+    result = result.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
+    return result;
+  }
+
+</script>
+<script>
+  const flutterBridge = new FlutterJSBridge();
+  const cache = new Cache();
+  const http = new Http();
+  const cookie = new Cookie();
+  var baseurl="https://www.baohuasy.com"
+  var header={ "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36 Edg/142.0.0.0" };
+  async function search(key,page) {
+    if(page > 1){
+      return  "[]";
+    }
+    cookie.remove(baseurl)
+    var get=await http.Get(baseurl,JSON.stringify(header),true);
+    var s=get.data
+    var act=s.match(/"act".*?"(.{16})"/)[1]
+    var sub=s.match(/name="submit".*?value="(.*?)"/)[1]
+    var url=baseurl+"/sscc/"
+    var body="act="+act+"&q="+(await  flutterBridge.utf8ToGbkUrlEncoded(key))+"&submit="+(await  flutterBridge.utf8ToGbkUrlEncoded(sub));
+    var myheader={
+      ...header,
+    }
+    get=await http.Post(url,JSON.stringify(myheader),body,"application/x-www-form-urlencoded",false);
+    var burl=baseurl+"/sscc/"+get.headers["location"]
+    get=await http.Post(url,JSON.stringify(myheader),body,"application/x-www-form-urlencoded",true);
+    var result=get.data
+    var c2=result.match(/c2="(.*?)"/)[1]
+    var u2=result.match(/src="(.*?)"/)[1]
+    var origin=baseurl.match(/[^.]+[^/]+/)[0]
+    var str=(await http.Get(origin+u2,JSON.stringify(myheader),false)).data.match(/function.*\(\)\}/)[0];
+    eval(str);
+    temp=ajax(c2)
+    await http.Get(origin+temp,JSON.stringify(myheader),false)
+    result=(await http.Get(burl,JSON.stringify(myheader),false)).data;
+
+    var actyzm=result.match(/actyzm" value="([^"]+)"/)[1];
+    var button=result.match(/button" value="([^"]+)"/)[1];
+    url=burl;
+    var code=url.replace(/\/sscc.*/,'')+"/member/getcode.asp";
+    var yzco=await cache.get("cookie");
+    async function succes() {
+      var myheader={
+        ...header,
+        "Referer":burl,
+      }
+      var yzm =await flutterBridge.getVerificationCode(code, JSON.stringify(myheader));
+      var body="actyzm="+actyzm+"&yzm="+yzm+"&button="+(await  flutterBridge.utf8ToGbkUrlEncoded(button));
+      var hm = (await http.Post(burl, JSON.stringify(myheader),body,"application/x-www-form-urlencoded", false)).data;
+      var co = await cookie.getCookie(url, "g3jy9sqo0ws");
+      await cache.set("cookie", yzm + ',g3jy9sqo0ws=' + co)
+      return hm;
+    }
+    if(yzco && yzco!=''){
+      var v=yzco.split(',');
+      var body="actyzm="+actyzm+"&yzm="+v[0]+"&button="+(await  flutterBridge.utf8ToGbkUrlEncoded(button));
+      var myheader={
+        ...header,
+        "Referer":burl,
+        "Cookie":v[1]
+      }
+      result=(await http.Post(burl, JSON.stringify(myheader),body,"application/x-www-form-urlencoded", false)).data;
+      if(/请输入验证码/.test(result)){
+        flutterBridge.showToast("  ！验证码过期或有误，重新获取  ！")
+        result=await  succes();
+      }
+    }else{
+      result=await succes();
+    }
+    flutterBridge.text(0,result)
+    var books=[];
+    var html = $.parseHTML( result );
+    $(html).find(".B").each(function(index) {
+      try{
+        var $element = $(this);
+        var author =$element.find("dd").eq(1).find("span").eq(0).text();
+        var kind="";
+        var s=author.split("：");
+        if(s.length > 1){
+          author=s[1].trim()
+        }
+        if($element.find("dd").eq(1).find("span").length > 1){
+          kind=$element.find("dd").eq(1).find("span").eq(1).text();
+          s=kind.split("：");
+          if(s.length > 1){
+            kind=s[1].trim()
+          }
+        }
+        var img="";
+        var src = $element.find("img").attr('src');
+        var dataSrc = $element.find("img").attr('data-src');
+        if(dataSrc){
+          img=baseurl+dataSrc;
+        }else{
+          img=baseurl+src;
+        }
+        var book={
+          "bookUrl":baseurl+$element.find("a").eq(0).attr('href'),
+          "name":$element.find("a").eq(1).text(),
+          "author":author,
+          "kind":kind,
+          "coverUrl":img,
+          "intro":$element.find(".d2").text(),
+          "tocUrl":baseurl+$element.find("a").eq(0).attr('href'),
+          "wordCount":"",
+          "type":0,
+          "latestChapterTitle":$element.find(".p4").find("a").text(),
+        }
+        books.push(book);
+      }catch(e){
+
+      }
+    });
+
+    return JSON.stringify(books);
+  }
+
+  async function info(bookurl) {
+    var get=await http.Get(bookurl,JSON.stringify(header),true);
+    flutterBridge.text(1,get.data )
+    var html = $.parseHTML( get.data );
+    var info=$(html).find("#info")
+    var author =info.find("p").eq(0).text();
+    var kind= info.find("p").eq(1).find("span").eq(0).text();
+    var s=author.split("：");
+    if(s.length > 1){
+      author=s[1].trim()
+    }
+    s=kind.split("：");
+    if(s.length > 1){
+      kind=s[1].trim()
+    }
+    var img="";
+    var src = $(html).find(".Dimg").find("img").attr('src');
+    img=baseurl+src;
+    var book={
+      "bookUrl":bookurl,
+      "name":info.find("h1").text(),
+      "author":author,
+      "kind":kind,
+      "coverUrl":img,
+      "intro":$(html).find("#intro").text(),
+      "tocUrl":bookurl,
+      "wordCount":"",
+      "type":0,
+      "latestChapterTitle":info.find("p").eq(3).find("a").text(),
+    }
+    return JSON.stringify(book);
+  }
+
+  async function chapter(tocUrl) {
+    try {
+      var get = await http.Get(tocUrl, JSON.stringify(header), true);
+      flutterBridge.text(2,get.data )
+      // 检查返回数据是否有效
+      if (!get || !get.data) {
+        flutterBridge.log("获取数据失败：无效的响应数据");
+        return "[]";
+      }
+      var chapters=[];
+      var html = $.parseHTML(get.data);
+      var $htmlObj = $(html);
+      // 检查是否找到dl元素
+      var $dl = $htmlObj.find("dl");
+      if ($dl.length > 0) {
+        // 获取第一个dl元素
+        var $firstDl = $dl.eq(0);
+        var $children = $firstDl.children();
+        var dt=0;
+        var i=0;
+        // 遍历子元素
+        $children.each(function(index) {
+          var $child = $(this);
+          if($child.prop("tagName").toLowerCase() == "dt".toLowerCase()){
+            dt++;
+          }else if(dt >= 2){
+            var chapter={
+              "name" :$(this).text(),
+              "chapterId":"https://m.baohuasy.com/"+$(this).find("a").attr('href'),
+              "index" :i,
+              "isPay":false,
+              "isVip":false,
+              "isVolume":false,
+              "tag":""
+            };
+            i++;
+            chapters.push(chapter);
+          }
+        });
+      } else {
+        flutterBridge.log("未找到dl元素");
+      }
+    } catch (error) {
+      flutterBridge.log("处理章节内容时出错："+error.message);
+    }
+    return JSON.stringify(chapters);
+  }
+
+  async function content(url) {
+    var first=await getContent(url)
+    flutterBridge.text(3,first )
+    var result=""
+    
+    // 使用并发安全的解析函数
+    var $tempContainer = parseHTMLSafely(removeHTMLTags(first));
+    var hrefs=[];
+    $tempContainer.find("#PageSet").find("a").each(function(index) {
+      var $child = $(this);
+      var href=$child.attr('href')
+      if(hrefs.indexOf(href)==-1){
+        hrefs.push(href);
+      }
+    })
+    result=getContentString($tempContainer);
+    removeHTMLSafely($tempContainer)
+    var s=url.split("//baoh")
+    s=(s[1]).split("/")
+    for(var i=0;i<hrefs.length;i++){
+      var url="https://m.baohuasy.com//baoh/"+s[1]+"/"+hrefs[i];
+      var re=await http.Get(url, JSON.stringify(header), true);
+      var $tempContainer = parseHTMLSafely(removeHTMLTags(re.data));
+      var r=getContentString($tempContainer);
+      result=result+r;
+      removeHTMLSafely($tempContainer)
+    }
+    result=result.replaceAll("</p><p>","\r\n").replaceAll("<br>","\r\n").replaceAll("<p>","").replaceAll("</p>","")
+    result=result.replace(/(##\s+"\n|\s+本章(没|未)完，.*|(\.\n)?.*看完记得收藏.*|\s+\/\d+\/.*|\s+。：.*|\s+：。.*|.*语录书院.*|4126.*|正在手打中.*|.*书架书签更方便.*|.*收藏此页.*|.*报错.*|.*耐心等待.*|温馨提示.*(123读书网|来看小说网|宝华书院).*|3920(\d+)\.\.$|^…\.\.$)/gm, '');
+    return result;
+  }
+
+  async function getfinds() {
+    var  sort=[{
+      title: "发现",
+      url: "",
+      type: 0,
+    }];
+    var get=await http.Get(baseurl,JSON.stringify(header),true);
+    var $tempContainer = parseHTMLSafely(removeHTMLTags(get.data ));
+    $tempContainer.find(".nav").find("a").each(function(index) {
+      if(index != 0){
+        sort.push({
+          title: $(this).text(),
+          url: baseurl+$(this).attr('href'),
+          type: 0,
+        });
+      }
+    });
+    removeHTMLSafely($tempContainer)
+    return JSON.stringify(sort);
+  }
+
+  async function find(url,page) {
+    if(page > 1){
+      return  "[]";
+    }
+    var get=await http.Get(url,JSON.stringify(header),true);
+    flutterBridge.text(0,get.data )
+    var books=[];
+    var html = $.parseHTML( get.data );
+    $(html).find(".B").each(function(index) {
+      try{
+        var $element = $(this);
+        var author =$element.find("dd").eq(1).find("span").eq(0).text();
+        var kind="";
+        var s=author.split("：");
+        if(s.length > 1){
+          author=s[1].trim()
+        }
+        if($element.find("dd").eq(1).find("span").length > 1){
+          kind=$element.find("dd").eq(1).find("span").eq(1).text();
+          s=kind.split("：");
+          if(s.length > 1){
+            kind=s[1].trim()
+          }
+        }
+        var img="";
+        var src = $element.find("img").attr('src');
+        var dataSrc = $element.find("img").attr('data-src');
+        if(dataSrc){
+          img=baseurl+dataSrc;
+        }else{
+          img=baseurl+src;
+        }
+        var book={
+          "bookUrl":baseurl+$element.find("a").eq(0).attr('href'),
+          "name":$element.find("a").text(),
+          "author":author,
+          "kind":kind,
+          "coverUrl":img,
+          "intro":$element.find(".d2").text(),
+          "tocUrl":baseurl+$element.find("a").eq(0).attr('href'),
+          "wordCount":"",
+          "type":0,
+          "latestChapterTitle":$element.find(".p4").find("a").text(),
+        }
+        books.push(book);
+      }catch(e){
+
+      }
+    });
+
+    return JSON.stringify(books);
+  }
+
+  function getContentString(tempContainer) {
+    var result=""
+    tempContainer.find(".TxtContent").each(function(index) {
+      var $child = $(this);
+      if($child.prop("tagName").toLowerCase() == "img".toLowerCase()){
+        result=result+$child.html()+"\r\n";
+      }else{
+        var txt=$child.html()
+        result=result+txt;
+      }
+    })
+    return result
+  }
+
+  async function getContent(url) {
+    cookie.remove(url)
+    var get = await http.Get(url, JSON.stringify(header), true);
+    var result=get.data;
+    var c2=result.match(/c2="(.*?)"/)[1]
+    var u2=result.match(/src="(.*?)"/)[1]
+    var origin=baseurl.match(/[^.]+[^/]+/)[0]
+    get=await http.Get(origin+u2,JSON.stringify(header),true);
+    var str=get.data.match(/function.*\(\)\}/)[0]
+    eval(str);
+    var temp=ajax(c2)
+    await http.Get(origin+temp,JSON.stringify(header),false)
+    result= (await http.Get(url, JSON.stringify(header), true)).data;
+    return result;
+  }
+
+
+  //返回http开头的则任务登录链接会跳webview，其他的会按照json解析显示弹窗
+  async function getloginurl(){
+    return baseurl;
+  }
+
+  //如果登录 url 为非 http 开头的弹窗界面，每次修改完弹窗就会执行此函数
+  async function login(){
+
+  }
+
+</script>
+</html>
