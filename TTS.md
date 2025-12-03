@@ -1,28 +1,8 @@
 
-# 轻悦时光
-一款多平台可用的阅读软件，通过 webview 来运行书源以达到多平台兼容的效果。
-
-# 交流群
-qq交流群：519620220
-
-# 正文文本说明
-正文文本不支持除了img 以外的标签, 图片可以使用img标签例如 \<img src="****">    
-img 标签里的src 支持header 如果需要修改header可以这么设置,http://127.0.0.1,{'headers':{'a':'b'}} ,当然这种写法不仅仅支持这也支持封面
-
-# 正文图片解析说明
-和文字同行的图片会默认识别为段评，小图显示，其他图片会正常显示。   
-例如
-````
-轻悦时光是最好用的阅读器<img src="a" />,支持多平台<img src="b" />。\r\n <img src="c" />
-````
-上面ab 两个图片会以段评显示，c正常显示。    
-如果想点击支持js请这么写： \<img src="b,{'js':'要运行的js'}"/> img src 必须用双引号包裹，所以后面的json只能用单引号。   
-关于图片是支持base64图片的，但如果base64里是svg图片请勿使用%，fluttersvg不支持百分比，轻阅读是用后端转码了，轻悦时光不支持带百分比的svg。
+# 轻悦时光朗读引擎规则
 
 # 通用 js
 通用 js 的函数分前台 webview 可用和源可用，源可用的话只能在书源代码中使用，前台 webview 可用那表示能在登录或者你启动的前台 webview 中使用, 未单独说明的是两种情况下都能用
-
-
 
 
 ````
@@ -463,47 +443,6 @@ img 标签里的src 支持header 如果需要修改header可以这么设置,http
 </script>
 ````
 
-# 书本类
-````
-{
-   "bookUrl":"", //书本 url 不可重复
-   "name":"",  //书本名称
-   "author":"", //作者
-   "kind":"", //分类
-   "coverUrl":"", //封面
-   "intro":"", //简介
-   "tocUrl":"", //目录 url 
-   "wordCount":"", //字数
-   "type":"", //书本类别 0 小说 1 听书 2 漫画
-   "latestChapterTitle":"",
-}
-````
-# 目录类
-````
-{
-    "name" :"", //章节标题
-    "chapterId":"", //正文 url
-    "index" :0, //index
-    "isPay":false, //是否需要付费
-    "isVip":false, //是否是 vip
-    "isVolume":false, //是否是卷名
-    "tag":"" //小标题
-};
-当isvip 为 true ispay 为false时会显示购买按钮
-````
-# 发现类
-````
-{
-    "title" :"", //标题
-    "url":"", //url
-    "type" :0, 
-    "width": 0,
-};
-当type为 0 正常解析发现页，当 type 为 1 则会用 webview 打开 url,
-width 为 0 时则默认处理宽度，1 是 则按照1行3个, 2 是一行2个 ，3 是一行1个
-url 为空是会按照 width = 3处理
-````
-
 # 登录类
 ````
 {
@@ -514,53 +453,22 @@ url 为空是会按照 width = 3处理
 当type为 0 正常解析发现页，当 type 为 1 则会用 webview 打开 url
 ````
 
-# 书源
-搜索函数
+
+# 引擎
+获取tts音频的请求链接
 ````
-//如果没有分页 请在 page 为 2 及以上返回  "[]"
-//当前函数返回书本数组的 json
-async function search(key,page) {
-}
+  // tts链接返回方式 ，不可缺少参数
+  async function getttsurl(speakText,speechRate){
+    return JSON.stringify({
+      "method": "get", //请求方式
+      "url": "", //请求 url
+      "headers": {}, //携带的 header
+      "body": "" //如果为 post 可以携带 body 参数
+    });
+  }
+
 ````
-详情页函数
-````
-//当前函数返回书本的 json
-async function info(bookurl) {
-}
-````
-目录页函数
-````
-//当前函数返回目录数组的 json
-async function chapter(tocUrl) {
-}
-````
-正文页函数
-````
-//提交内容为目录类里的chapterId
-//当前函数返回字符串
-async function content(url) {
-}
-````
-发现函数
-````
-//当前函数返回发现数组的 json
-async function getfinds() {
-}
-````
-发现搜索函数
-````
-//如果没有分页 请在 page 为 2 及以上返回  "[]"
-//当前函数返回书本数组的 json
-async function find(url,page) {
-}
-````
-购买函数
-````
-//提交内容bookurl为书本url，url为目录的chapterId
-// 执行完成后会刷新目录和正文
-async function pay(bookurl,url) {
-}
-````
+
 登录函数
 ````
 //返回http开头的url 或者 登录数组的json
