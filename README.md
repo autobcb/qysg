@@ -500,7 +500,7 @@ img 标签里的src 支持header 如果需要修改header可以这么设置,http
     "width": 0,
 };
 当type为 0 正常解析发现页，当 type 为 1 则会用 webview 打开 url,
-width 为 0 时则默认处理宽度，1 是 则按照1行3个, 2 是一行2个 ，3 是一行1个
+width 为 0 时则默认处理宽度（1行3个）， 1 是一行2个 ，3 是一行1个
 url 为空是会按照 width = 3处理
 ````
 
