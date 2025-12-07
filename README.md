@@ -5,6 +5,10 @@
 # 交流群
 qq交流群：519620220
 
+# 书本简介说明
+书本简介支持html ，如果需要使用html，请在最前面添加：@html: ，例如：@html: \<p>这是一个段落\</p>    。
+如果不加@html:前缀则会直接显示为文本。
+
 # 正文文本说明
 正文文本不支持除了img 以外的标签, 图片可以使用img标签例如 \<img src="****">    
 img 标签里的src 支持header 如果需要修改header可以这么设置,http://127.0.0.1,{'headers':{'a':'b'}} ,当然这种写法不仅仅支持这也支持封面
@@ -18,6 +22,13 @@ img 标签里的src 支持header 如果需要修改header可以这么设置,http
 上面ab 两个图片会以段评显示，c正常显示。    
 如果想点击支持js请这么写： \<img src="b,{'js':'要运行的js'}"/> img src 必须用双引号包裹，所以后面的json只能用单引号。   
 关于图片是支持base64图片的，但如果base64里是svg图片请勿使用%，fluttersvg不支持百分比，轻阅读是用后端转码了，轻悦时光不支持带百分比的svg。
+
+# 图片后面的json说明
+图片后面可以接一个json ，目前支持以下几个参数：
+- js：要运行的js，只能在书源代码中使用，在阅读器中携带js的图片是可以直接点击运行的
+- headers：访问图片时携带的headers，例如{'headers':{'a':'b'}}
+- imageDecode：是否需要解密图片，默认是false，如果需要解密图片需要在书源中实现解密函数
+
 
 # 通用 js
 通用 js 的函数分前台 webview 可用和源可用，源可用的话只能在书源代码中使用，前台 webview 可用那表示能在登录或者你启动的前台 webview 中使用, 未单独说明的是两种情况下都能用
@@ -569,5 +580,15 @@ async function getloginurl() {
 }
 async function login(){
 
+}
+````
+
+图片解密函数
+````
+// url 为图片的url,如果需要传递参数可以在图片后接json字符串，例如：http://127.0.0.1,{'headers':{'a':'b'}}
+//图片解密，image 为加密的图片的base64，执行的js必须是字符串所以这参数只能base64转码
+//这个函数得返回byteList List<int> ,并且能直接被Uint8List.fromList(byteList)接受
+async function imagedecrypt(url,image){
+   
 }
 ````
