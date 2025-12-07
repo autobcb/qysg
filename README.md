@@ -29,6 +29,13 @@ img 标签里的src 支持header 如果需要修改header可以这么设置,http
 - headers：访问图片时携带的headers，例如{'headers':{'a':'b'}}
 - imageDecode：是否需要解密图片，默认是false，如果需要解密图片需要在书源中实现解密函数
 
+# js加密解密
+如果你的代码涉及到加密解密可以引用下面的js
+````
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+````
+
+
 
 # 通用 js
 通用 js 的函数分前台 webview 可用和源可用，源可用的话只能在书源代码中使用，前台 webview 可用那表示能在登录或者你启动的前台 webview 中使用, 未单独说明的是两种情况下都能用
