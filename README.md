@@ -238,6 +238,20 @@ img 标签里的src 支持header 如果需要修改header可以这么设置,http
         return  "";
       }
     }
+    
+     /**
+     * 启动前台 webview 并对每次打开的 url 进行拦截
+     * @param url 网址
+     * @param title 标题
+     * @param header 请求的header头，此参数必须是json字符串
+     */
+    async startBrowserWithShouldOverrideUrlLoading(url,title,header) {
+      try {
+        return await window.flutter_inappwebview.callHandler('startBrowserWithShouldOverrideUrlLoading',url,title,header);
+      } catch (error) {
+        return  "";
+      }
+    }
 
     //专门为段评设置的半屏显示，不返回任何东西
     async startBrowserDp(url,title) {
@@ -522,12 +536,14 @@ img 标签里的src 支持header 如果需要修改header可以这么设置,http
 {
     "title" :"", //标题
     "url":"", //url
+    "js":"", //要运行的 js
     "type" :0, 
     "width": 0,
 };
+url 和 js 只能填一个
 当type为 0 正常解析发现页，当 type 为 1 则会用 webview 打开 url,
 width 为 0 时则默认处理宽度（1行3个）， 1 是一行2个 ，3 是一行1个
-url 为空是会按照 width = 3处理
+url 和 js 都为空是会按照 width = 3处理
 ````
 
 # 登录类
@@ -605,5 +621,15 @@ async function login(){
 //这个函数得返回byteList List<int> ,并且能直接被Uint8List.fromList(byteList)接受
 async function imagedecrypt(url,image){
    
+}
+````
+
+webview 拦截函数
+````
+// 当调用startBrowserWithShouldOverrideUrlLoading时必须有此函数
+// url 为每次打开的 url
+// 返回 false 则会取消打开这个网页
+async function shouldOverrideUrlLoading(url){
+   return true;
 }
 ````
