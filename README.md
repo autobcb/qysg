@@ -49,9 +49,9 @@ img 标签里的src 支持header 如果需要修改header可以这么设置,http
 通用 js 的函数分前台 webview 可用和源可用，源可用的话只能在书源代码中使用，前台 webview 可用那表示能在登录或者你启动的前台 webview 中使用, 未单独说明的是两种情况下都能用
 
 
-
-
 ````
+<!-- 没用到jq请去掉-->
+<script src="https://vc.jd.com/web/js/jquery-3.1.1.min.js"></script>
 <script>
   var isCookieJar=true;// 不需要CookieJar请修改此处
   class FlutterJSBridge {
@@ -98,6 +98,25 @@ img 标签里的src 支持header 如果需要修改header可以这么设置,http
         return  "0.0.0";
       }
     }
+    
+    //将简体字转成繁体字
+    async toTraditional(str) {
+      try {
+        return await window.flutter_inappwebview.callHandler('toTraditional',str);
+      } catch (error) {
+        return  "";
+      }
+    }
+    
+    //将繁体字转成简体字
+    async toSimplified(str) {
+      try {
+        return await window.flutter_inappwebview.callHandler('toSimplified',str);
+      } catch (error) {
+        return  "";
+      }
+    }
+
 
     //获取设备唯一id
     async getDeviceid() {
@@ -149,6 +168,7 @@ img 标签里的src 支持header 如果需要修改header可以这么设置,http
       }
     }
 
+    //webview 里禁止使用，webview请使用js获取ua （navigator.userAgent）
     //获取默认ua
     async getWebViewUA() {
       try {
@@ -293,10 +313,10 @@ img 标签里的src 支持header 如果需要修改header可以这么设置,http
       }
     }
     
-    //提交内容书本信息 json 后的字符串
-    async addbook(book) {
+    //提交内容bookUrl,我会调用书源 info 函数来获取这本书的信息
+    async addbook(bookUrl) {
       try {
-        return await window.flutter_inappwebview.callHandler('addbook',book);
+        return await window.flutter_inappwebview.callHandler('addbook',bookUrl);
       } catch (error) {
         return  "";
       }
@@ -324,11 +344,11 @@ img 标签里的src 支持header 如果需要修改header可以这么设置,http
 
   }
 
-  //webview请勿使用
+  //webview下isCookieJar必定true 会自动处理cookie
   //以下提交的url，headers,body 都必须为字符串,headers必须为json字符串
   //当followRedirects 为 false 时不处理重定向，当为 true 时会自动处理重定向 ，如不明白用途直接用 true 最佳
   // 以下所有参数除当followRedirects外均为 String
-  // 如果需要使用http2协议 请在url 前添加 https2:// ，例如 http2://baidu.com
+  // 如果需要使用http2协议 请在url 前添加 http2:// ，例如 http2://baidu.com
   // 如果https一直被盾拦截 ，可以使用https2协议
   class Http {
     constructor() {}
@@ -501,8 +521,8 @@ img 标签里的src 支持header 如果需要修改header可以这么设置,http
   }
 
 </script>
-````
 
+````
 # 书本类
 ````
 {

@@ -9,7 +9,6 @@
 </body>
 <!-- 没用到jq请去掉-->
 <script src="https://vc.jd.com/web/js/jquery-3.1.1.min.js"></script>
-<!--如果要引入外部 js 必须在书源代码的上面-->
 <script>
   var isCookieJar=true;// 不需要CookieJar请修改此处
   class FlutterJSBridge {
@@ -56,6 +55,25 @@
         return  "0.0.0";
       }
     }
+
+    //将简体字转成繁体字
+    async toTraditional(str) {
+      try {
+        return await window.flutter_inappwebview.callHandler('toTraditional',str);
+      } catch (error) {
+        return  "";
+      }
+    }
+
+    //将繁体字转成简体字
+    async toSimplified(str) {
+      try {
+        return await window.flutter_inappwebview.callHandler('toSimplified',str);
+      } catch (error) {
+        return  "";
+      }
+    }
+
 
     //获取设备唯一id
     async getDeviceid() {
@@ -107,6 +125,7 @@
       }
     }
 
+    //webview 里禁止使用，webview请使用js获取ua （navigator.userAgent）
     //获取默认ua
     async getWebViewUA() {
       try {
@@ -197,6 +216,20 @@
       }
     }
 
+    /**
+     * 启动前台 webview 并对每次打开的 url 进行拦截
+     * @param url 网址
+     * @param title 标题
+     * @param header 请求的header头，此参数必须是json字符串
+     */
+    async startBrowserWithShouldOverrideUrlLoading(url,title,header) {
+      try {
+        return await window.flutter_inappwebview.callHandler('startBrowserWithShouldOverrideUrlLoading',url,title,header);
+      } catch (error) {
+        return  "";
+      }
+    }
+
     //专门为段评设置的半屏显示，不返回任何东西
     async startBrowserDp(url,title) {
       try {
@@ -237,21 +270,43 @@
       }
     }
 
-    //提交内容书本信息 json 后的字符串
-    async addbook(book) {
+    //提交内容bookUrl,我会调用书源 info 函数来获取这本书的信息
+    async addbook(bookUrl) {
       try {
-        return await window.flutter_inappwebview.callHandler('addbook',book);
+        return await window.flutter_inappwebview.callHandler('addbook',bookUrl);
       } catch (error) {
         return  "";
       }
     }
 
+    //utf8 字符串转base64
+    async base64encode(str) {
+      try {
+        return await window.flutter_inappwebview.callHandler('base64encode',str);
+      } catch (error) {
+        return  "";
+      }
+    }
+
+    //base64 转utf8字符串
+    async base64decode(str) {
+      try {
+        return await window.flutter_inappwebview.callHandler('base64decode',str);
+      } catch (error) {
+        return  "";
+      }
+    }
+
+
+
   }
 
-  //webview请勿使用
+  //webview下isCookieJar必定true 会自动处理cookie
   //以下提交的url，headers,body 都必须为字符串,headers必须为json字符串
   //当followRedirects 为 false 时不处理重定向，当为 true 时会自动处理重定向 ，如不明白用途直接用 true 最佳
   // 以下所有参数除当followRedirects外均为 String
+  // 如果需要使用http2协议 请在url 前添加 http2:// ，例如 http2://baidu.com
+  // 如果https一直被盾拦截 ，可以使用https2协议
   class Http {
     constructor() {}
 
@@ -368,6 +423,15 @@
       }
     }
 
+    //设置单独一个cookie
+    async setCookie(url,key,value) {
+      try {
+        return await window.flutter_inappwebview.callHandler('cookie.setcookie',url,key,value);
+      } catch (error) {
+        return  null;
+      }
+    }
+
     //通过 url 获取单个 cookie 的值
     async getCookie(url,value) {
       try {
@@ -414,6 +478,7 @@
   }
 
 </script>
+
 <script>
   const flutterBridge = new FlutterJSBridge();
   const cache = new Cache();
@@ -441,8 +506,6 @@
   async function login(){
 
   }
-
-
-
 </script>
+
 </html>
